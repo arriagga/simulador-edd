@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Simulador EDD — Nivel Secundario | MINERD</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,800;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --azul: #1a237e;
+  --azul-medio: #3f51b5;
+  --azul-claro: #e8eaf6;
+  --azul-borde: #c5c9e8;
+  --texto: #0d1b4b;
+  --texto-suave: #4a5068;
+  --verde: #2e7d32;
+  --verde-bg: #e8f5e9;
+  --rojo: #c62828;
+  --rojo-bg: #ffebee;
+  --naranja: #e65100;
+  --blanco: #ffffff;
+  --fondo: #eef0f8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--fondo);
+  min-height: 100vh;
+  color: var(--texto);
+  font-size: 16px;
+}
+
+/* ─── HEADER ─── */
+header {
+  background: var(--azul);
+  color: #fff;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 3px 16px rgba(26,35,126,.35);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.hdr-inner { max-width: 720px; margin: 0 auto; }
+header h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: .3px;
+  line-height: 1.3;
+}
+header p { font-size: .75rem; opacity: .78; margin-top: 3px; }
+.timer-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.13);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-family: monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 8px;
+  letter-spacing: 1px;
+}
+.timer-pill.warn { background: rgba(230,81,0,.35); border-color: rgba(255,167,38,.6); }
+.timer-dot { width:7px; height:7px; border-radius:50%; background:#69f0ae; animation: blink 1.5s infinite; }
+@keyframes blink { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+/* ─── CONTAINER ─── */
+.container { max-width: 720px; margin: 0 auto; padding: 16px 12px 48px; }
+
+/* ─── WELCOME ─── */
+#welcome-screen {
+  background: var(--blanco);
+  border-radius: 18px;
+  padding: 28px 20px;
+  box-shadow: 0 4px 24px rgba(26,35,126,.1);
+  animation: up .4s ease;
+}
+#welcome-screen h2 {
+  font-family: 'Fraunces', serif;
+  color: var(--azul);
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  text-align: center;
+}
+.badge-nuevo {
+  display: inline-block;
+  background: #e65100;
+  color: #fff;
+  font-size: .65rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 10px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.lead { color: var(--texto-suave); line-height: 1.7; margin-bottom: 14px; font-size: .9rem; }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+.icard {
+  background: var(--azul-claro);
+  border-left: 4px solid var(--azul-medio);
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+.icard .lbl { font-size: .63rem; color: #5c6497; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 2px; }
+.icard .val { font-size: .93rem; font-weight: 700; color: var(--azul); }
+.feature-box {
+  background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+  border: 1.5px solid #a5d6a7;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 14px 0;
+  font-size: .88rem;
+  color: #1b5e20;
+  line-height: 1.65;
+}
+.feature-box strong { font-size: .92rem; display: block; margin-bottom: 4px; }
+.note {
+  font-size: .8rem; color: var(--texto-suave); line-height: 1.65;
+  background: var(--azul-claro); padding: 10px 12px;
+  border-radius: 8px; border: 1px solid var(--azul-borde); margin-bottom: 12px;
+}
+input[type="text"] {
+  width: 100%; padding: 13px 16px;
+  border: 2px solid var(--azul-borde);
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  text-align: center;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+  color: var(--texto);
+}
+input[type="text"]:focus {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(63,81,181,.15);
+}
+
+/* ─── PROGRESS ─── */
+.prog-wrap {
+  background: var(--blanco);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 8px rgba(0,0,0,.07);
+}
+.prog-hdr {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 6px; font-size: .78rem; color: var(--texto-suave); font-weight: 600;
+}
+.prog-bar { height: 7px; background: var(--azul-borde); border-radius: 4px; overflow: hidden; }
+.prog-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--azul), var(--azul-medio));
+  border-radius: 4px;
+  transition: width .4s ease;
+}
+
+/* ─── DOTS ─── */
+.dots-wrap {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  background: var(--blanco);
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 1px 8px rgba(0,0,0,.07);
+  margin-bottom: 12px;
+}
+.dot {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--azul-borde);
+  background: var(--blanco);
+  cursor: pointer;
+  font-size: .62rem;
+  font-weight: 700;
+  color: #6b72a8;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.dot.current { border-color: var(--azul); background: var(--azul); color: #fff; }
+.dot.correct { background: var(--verde); border-color: var(--verde); color: #fff; }
+.dot.wrong { background: var(--rojo); border-color: var(--rojo); color: #fff; }
+.dot.skipped { background: #9e9e9e; border-color: #9e9e9e; color: #fff; }
+
+/* ─── QUESTION CARD ─── */
+.q-card {
+  background: var(--blanco);
+  border-radius: 16px;
+  padding: 20px 16px;
+  box-shadow: 0 3px 16px rgba(26,35,126,.09);
+  margin-bottom: 12px;
+  animation: up .3s ease;
+}
+@keyframes up { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+
+.q-badge {
+  display: inline-block;
+  background: var(--azul);
+  color: #fff;
+  font-size: .62rem;
+  padding: 3px 11px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.q-badge.conceptual { background: #6a1b9a; }
+.q-num { font-size: .72rem; color: #9b9ec7; margin-bottom: 6px; font-weight: 600; }
+.q-text {
+  font-size: .9rem;
+  line-height: 1.8;
+  color: var(--texto);
+  font-weight: 500;
+  margin-bottom: 18px;
+}
+
+/* ─── OPTIONS ─── */
+.options { display: flex; flex-direction: column; gap: 9px; }
+.opt {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px;
+  border: 2px solid var(--azul-borde);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: all .2s;
+  background: #f8f9ff;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.opt:not(.disabled):hover { border-color: var(--azul-medio); background: var(--azul-claro); }
+.opt.selected { border-color: var(--azul-medio); background: var(--azul-claro); }
+.opt.disabled { cursor: default; }
+.opt.rev-ok { border-color: var(--verde) !important; background: var(--verde-bg) !important; }
+.opt.rev-err { border-color: var(--rojo) !important; background: var(--rojo-bg) !important; }
+.opt-ltr {
+  width: 30px; height: 30px; min-width: 30px;
+  border-radius: 50%;
+  background: var(--azul);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .78rem;
+  flex-shrink: 0; margin-top: 1px;
+}
+.opt.selected .opt-ltr { background: var(--azul-medio); }
+.opt.rev-ok .opt-ltr { background: var(--verde) !important; }
+.opt.rev-err .opt-ltr { background: var(--rojo) !important; }
+.opt-txt { font-size: .87rem; line-height: 1.6; padding-top: 4px; }
+
+/* ─── FEEDBACK BOX ─── */
+.feedback-box {
+  margin-top: 16px;
+  border-radius: 12px;
+  padding: 14px 15px;
+  animation: feedIn .35s ease;
+  border: 1.5px solid;
+}
+@keyframes feedIn { from { opacity:0; transform: scaleY(.9); transform-origin: top; } to { opacity:1; transform: scaleY(1); } }
+.feedback-box.correct {
+  background: var(--verde-bg);
+  border-color: #a5d6a7;
+}
+.feedback-box.wrong {
+  background: var(--rojo-bg);
+  border-color: #ef9a9a;
+}
+.fb-header {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 700; font-size: .88rem; margin-bottom: 8px;
+}
+.fb-header.correct { color: var(--verde); }
+.fb-header.wrong { color: var(--rojo); }
+.fb-icon { font-size: 1.1rem; }
+.fb-correct-label {
+  font-size: .78rem;
+  color: var(--verde);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.fb-just {
+  font-size: .83rem;
+  color: #2e3460;
+  line-height: 1.7;
+  padding: 10px 12px;
+  background: rgba(255,255,255,.65);
+  border-radius: 8px;
+  border-left: 3px solid;
+}
+.feedback-box.correct .fb-just { border-color: var(--verde); }
+.feedback-box.wrong .fb-just { border-color: var(--rojo); }
+.fb-just-label { font-weight: 700; color: var(--azul); }
+
+/* ─── NAV BUTTONS ─── */
+.nav-btns {
+  display: flex; gap: 8px;
+  justify-content: flex-end;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .18s;
+  letter-spacing: .2px;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 46px;
+}
+.btn-primary { background: var(--azul); color: #fff; }
+.btn-primary:hover { background: #283593; }
+.btn-success { background: var(--azul-medio); color: #fff; }
+.btn-success:hover { background: #303f9f; }
+.btn-outline { background: #fff; color: var(--azul); border: 2px solid var(--azul); }
+.btn-outline:hover { background: var(--azul-claro); }
+.btn-sm { padding: 10px 18px; font-size: .82rem; min-height: 42px; }
+.btn-fin {
+  background: linear-gradient(135deg, #e65100, #ff8f00);
+  color: #fff; border: none;
+  border-radius: 10px;
+  padding: 11px 20px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 42px;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-fin:hover { background: linear-gradient(135deg,#bf360c,#e65100); }
+
+/* ─── RESULTS ─── */
+#results-screen { display: none; }
+.score-card {
+  background: var(--blanco);
+  border-radius: 18px;
+  padding: 28px 20px;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(26,35,126,.1);
+  margin-bottom: 20px;
+  animation: up .4s ease;
+}
+.score-big {
+  font-family: 'Fraunces', serif;
+  font-size: 4.5rem;
+  font-weight: 800;
+  color: var(--azul);
+  line-height: 1;
+}
+.score-lbl { font-size: .88rem; color: #888; margin-top: 4px; }
+.score-tag {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 7px 26px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+.tag-ok { background: var(--verde-bg); color: var(--verde); }
+.tag-no { background: var(--rojo-bg); color: var(--rojo); }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 18px; }
+.stat { background: var(--azul-claro); border-radius: 10px; padding: 13px 6px; }
+.stat-n { font-family: 'Fraunces', serif; font-size: 1.8rem; font-weight: 700; color: var(--azul); }
+.stat-l { font-size: .7rem; color: #6b72a8; margin-top: 2px; }
+
+/* ─── REVIEW ─── */
+.review-wrap { animation: up .4s ease; }
+.review-wrap h3 {
+  font-family: 'Fraunces', serif;
+  color: var(--azul);
+  font-size: 1.1rem;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--azul-borde);
+}
+.err-item {
+  background: var(--blanco);
+  border-radius: 13px;
+  padding: 16px 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 8px rgba(0,0,0,.07);
+  border-left: 4px solid var(--rojo);
+}
+.ok-item {
+  background: var(--blanco);
+  border-radius: 13px;
+  padding: 14px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 8px rgba(0,0,0,.05);
+  border-left: 4px solid var(--verde);
+}
+.err-num { font-size: .72rem; color: var(--rojo); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+.ok-num { font-size: .72rem; color: var(--verde); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+.err-q { font-size: .85rem; color: var(--texto); font-weight: 500; line-height: 1.7; margin-bottom: 9px; }
+.err-just {
+  font-size: .8rem; color: #2e3460; line-height: 1.65;
+  padding: 10px 11px;
+  background: #f8f9ff;
+  border-radius: 8px;
+  margin-top: 8px;
+  border-left: 3px solid var(--azul-borde);
+}
+.just-lbl { font-weight: 700; color: var(--azul); }
+
+footer {
+  text-align: center;
+  padding: 16px 14px;
+  color: #9b9ec7;
+  font-size: .73rem;
+  margin-top: 8px;
+}
+footer strong { color: var(--azul); }
+
+@media(max-width:480px){
+  header h1 { font-size: .88rem; }
+  .info-grid, .stats-grid { grid-template-columns: 1fr; }
+  .score-big { font-size: 3.2rem; }
+  .nav-btns { flex-direction: column; }
+  .btn, .btn-fin { width: 100%; text-align: center; }
+  .dot { width: 24px; height: 24px; font-size: .58rem; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-inner">
+    <h1>Simulador &mdash; Evaluaci&oacute;n del Desempe&ntilde;o Docente (EDD)</h1>
+    <p>Nivel Secundario (1ro a 6to) &nbsp;&middot;&nbsp; MINERD</p>
+    <div class="timer-pill" id="timer-pill">
+      <span class="timer-dot"></span>
+      <span id="timer-txt">60:00</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- ══════════ PANTALLA DE BIENVENIDA ══════════ -->
+<div id="welcome-screen">
+  <h2>Bienvenido/a al Simulador EDD <span class="badge-nuevo">v2 · Feedback inmediato</span></h2>
+  <p class="lead">Dise&ntilde;ado para <strong>docentes del Nivel Secundario</strong> (1ro&ndash;6to). Presenta situaciones reales del aula dominicana y conceptos del dise&ntilde;o curricular del MINERD con el mismo nivel de exigencia de la EDD oficial.</p>
+
+  <div class="feature-box">
+    <strong>✨ Novedad: Justificación inmediata</strong>
+    En esta versión, al seleccionar tu respuesta verás de inmediato si es correcta o incorrecta, <strong>junto con la justificación curricular</strong> antes de pasar a la siguiente pregunta. Ya no avanzas a ciegas.
+  </div>
+
+  <div class="info-grid">
+    <div class="icard"><div class="lbl">Total de ítems</div><div class="val">40 preguntas</div></div>
+    <div class="icard"><div class="lbl">Escala MINERD</div><div class="val">Sobre 20 puntos</div></div>
+    <div class="icard"><div class="lbl">Parte I · Situacionales</div><div class="val">30 situaciones</div></div>
+    <div class="icard"><div class="lbl">Parte II · Conceptuales</div><div class="val">10 preguntas</div></div>
+    <div class="icard"><div class="lbl">Tiempo total</div><div class="val">60 minutos</div></div>
+    <div class="icard"><div class="lbl">Feedback</div><div class="val">Inmediato ✔</div></div>
+  </div>
+
+  <p class="note">&#128218; Basado en la <strong>Ley 66-97</strong>, el <strong>Dise&ntilde;o Curricular del Nivel Secundario</strong> y la <strong>Ley 136-03</strong>. Las preguntas y opciones se mezclan aleatoriamente en cada intento.</p>
+
+  <div style="margin-top:20px;max-width:360px;margin-left:auto;margin-right:auto">
+    <input type="text" id="user-name" placeholder="Nombre completo del/la docente">
+    <button class="btn btn-primary" style="width:100%;margin-top:12px;font-size:.95rem" onclick="startSimulator()">&#9654; Iniciar Simulador EDD</button>
+  </div>
+</div>
+
+<!-- ══════════ PANTALLA DEL QUIZ ══════════ -->
+<div id="quiz-screen" style="display:none">
+  <div class="prog-wrap">
+    <div class="prog-hdr">
+      <span id="prog-txt">Pregunta 1 de 40</span>
+      <span id="prog-pct">0 %</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="dots-wrap" id="dots-wrap"></div>
+  <div id="q-area"></div>
+</div>
+
+<!-- ══════════ PANTALLA DE RESULTADOS ══════════ -->
+<div id="results-screen">
+  <div class="score-card">
+    <div style="color:#9b9ec7;font-size:.72rem;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Resultado Final &mdash; EDD Nivel Secundario</div>
+    <div class="score-big" id="final-score">--</div>
+    <div class="score-lbl">puntos sobre 20</div>
+    <div class="score-tag" id="score-tag"></div>
+    <div id="nombre-resultado" style="margin-top:10px;font-size:.9rem;color:var(--azul);font-weight:700"></div>
+    <div class="stats-grid">
+      <div class="stat"><div class="stat-n" id="s-ok">--</div><div class="stat-l">Correctas</div></div>
+      <div class="stat"><div class="stat-n" id="s-err">--</div><div class="stat-l">Incorrectas</div></div>
+      <div class="stat"><div class="stat-n" id="s-pct">--</div><div class="stat-l">Porcentaje</div></div>
+    </div>
+    <div style="margin-top:18px">
+      <button class="btn btn-outline" onclick="restartSimulator()">&#128260; Nuevo intento</button>
+    </div>
+  </div>
+  <div id="review-area"></div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+  Simulador EDD &nbsp;&middot;&nbsp; Nivel Secundario &nbsp;&middot;&nbsp; MINERD<br>
+  <strong>Dise&ntilde;o original: Lic. Pablo J&aacute;quez Caba</strong> &nbsp;&middot;&nbsp; REGIONAL 06<br>
+  <span style="color:#bdbdbd">Versión modificada: feedback inmediato por pregunta</span>
+</footer>
+
+<script>
+var questions = [
+{id:1,type:"situacional",text:"Una docente de Lengua Española de 2do de Secundaria lleva tres meses con su grupo. Desde hace dos semanas ha observado un patrón progresivo y preocupante en uno de sus estudiantes: ha dejado de participar en clase, llega con ojeras frecuentes, y sus últimas tres producciones escritas contienen referencias reiteradas a la soledad y la muerte. Dos compañeros del joven se acercaron a la docente por separado para comentarle que el estudiante ha dicho que 'ya nada tiene sentido'. La docente de Artes también reportó que sus trabajos visuales son consistentemente oscuros, algo inusual al inicio del año. La orientadora fue notificada verbalmente hace diez días pero aún no ha convocado al estudiante. La Ley 66-97 y las normativas del MINERD establecen que el docente tiene un rol protector activo ante situaciones de riesgo. Considerando que las señales se han mantenido y escalado sin respuesta institucional, ¿cuál es la acción más adecuada de la docente?",opts:["Esperar a que la orientadora tome la iniciativa, ya que intervenir sin coordinación previa podría duplicar esfuerzos o interferir con el proceso de acompañamiento que quizás ya está en curso.","Buscar un espacio privado y empático para dialogar con el estudiante sin presionarlo, y notificar nuevamente a orientación y dirección mediante comunicación escrita que documente el patrón observado con urgencia.","Seleccionar algunos de sus trabajos escritos y utilizarlos anónimamente como punto de partida para un debate grupal sobre el bienestar emocional, convirtiendo la situación en oportunidad pedagógica.","Llamar directamente a los padres del estudiante describiendo el patrón observado sin pasar por los canales institucionales, porque la urgencia justifica omitir los procedimientos formales del centro."],correct:1,just:"Ante indicadores de riesgo emocional persistentes y escalados, el docente no puede esperar pasivamente. Debe actuar con urgencia, documentar el patrón y coordinar con orientación y dirección a través de canales formales. La Ley 66-97 y las normativas del MINERD establecen que el docente es el primer agente protector del bienestar integral del estudiantado, y la notificación escrita garantiza la trazabilidad institucional del caso."},
+{id:2,type:"situacional",text:"Una docente de Química con ocho años de experiencia recibe al inicio del año un grupo de 4to de Secundaria formado por 36 estudiantes provenientes de cuatro centros distintos. Tiene previsto comenzar la Unidad 1 (Estructura atómica y tabla periódica) desde el primer día, argumentando que 'no hay tiempo que perder'. A las dos semanas detecta que más de la mitad tiene vacíos significativos en nomenclatura química y notación científica —prerrequisitos directos de los contenidos de 4to—. El coordinador pedagógico, al revisar los resultados del primer trabajo, señala que la planificación no consideró el punto de partida real del grupo. El enfoque por competencias del currículo del nivel secundario establece que la planificación pertinente requiere conocer los saberes previos del grupo específico que se atiende. ¿Qué práctica docente debió haber aplicado antes de iniciar la enseñanza de nuevos contenidos?",opts:["Revisar el expediente académico de cada estudiante del año anterior, ya que las calificaciones registradas son el indicador más confiable del nivel de dominio real de los contenidos previos.","Aplicar una evaluación diagnóstica específica al inicio del año que le permitiera identificar los saberes previos reales del grupo y planificar desde el punto de partida de esos 36 estudiantes concretos.","Iniciar la unidad como estaba planificado y, una vez detectadas las dificultades, hacer una pausa de dos semanas para repasar los contenidos faltantes de forma general sin alterar el cronograma.","Solicitar al Distrito que reorganice el grupo homogéneamente por nivel de dominio antes de iniciar la instrucción, ya que los grupos heterogéneos dificultan la implementación del currículo."],correct:1,just:"La evaluación diagnóstica es un principio fundamental del enfoque por competencias del currículo del nivel secundario. Permite identificar el punto de partida real de cada grupo, independientemente de lo que el currículo establece que 'debieron haber aprendido'. Las calificaciones del año anterior no sustituyen este proceso porque provienen de contextos, docentes e instrumentos distintos al contexto actual."},
+{id:3,type:"situacional",text:"Un docente de Física de 5to de Secundaria tiene en su grupo cinco estudiantes que acumulan tardanzas, ausencias parciales y salidas anticipadas. Al conversar individualmente con cada uno, descubre que trabajan en empleos informales (colmados, talleres, ventas) para ayudar económicamente a sus hogares y que en muchos casos llevan la merienda de hermanos menores al colegio antes de llegar. Sus promedios son bajos, pero cuando están presentes demuestran comprensión y capacidad analítica. El reglamento establece que tres tardanzas equivalen a una ausencia y que la acumulación puede generar reprobación automática. El docente se pregunta cómo conciliar la aplicación de la norma con el derecho a la educación garantizado por la Ley 66-97. Considerando el enfoque de equidad del currículo del nivel secundario, ¿cuál debe ser la primera acción del docente?",opts:["Aplicar el reglamento de asistencia de forma estricta a todos los estudiantes, ya que hacer excepciones viola el principio de equidad que debe regir la vida institucional del centro.","Documentar la situación de cada estudiante, dialogar con ellos y sus familias con empatía, y coordinar con dirección y orientación un plan de apoyo individualizado que no vulnere el derecho a la educación ni comprometa las normas institucionales.","Ignorar las tardanzas y ausencias sin documentarlo ni informarlo, para no perjudicar a los estudiantes con el reglamento dado el contexto que enfrentan.","Recomendar a los estudiantes que soliciten el traslado a la modalidad de adultos, donde las condiciones de asistencia son más flexibles para quienes trabajan durante el día."],correct:1,just:"La Ley 66-97 garantiza el derecho a la educación sin exclusión. El enfoque de equidad del currículo del nivel secundario reconoce que igual trato no siempre significa trato justo. El docente debe documentar, dialogar y coordinar institucionalmente, evitando tanto la omisión de las normas como la penalización automática de situaciones de vulnerabilidad que escapan al control del estudiante."},
+{id:4,type:"situacional",text:"Durante una clase de Ciencias Sociales de 1ro de Secundaria en la que se trabajaba el tema de migraciones internacionales, un estudiante hace en voz alta un comentario abiertamente despectivo sobre la comunidad haitiana, atribuyéndole afirmaciones estereotipadas y peyorativas. Al menos doce compañeros ríen o asienten con aprobación, y el único estudiante de origen haitiano en el grupo baja la cabeza visiblemente afectado y no vuelve a participar el resto de la clase. El docente percibe que el comentario no es aislado: durante semanas ha notado que el grupo normaliza este tipo de expresiones y que el estudiante haitiano raramente es incluido en los grupos de trabajo. El currículo dominicano establece el respeto a la diversidad y la ciudadanía democrática como ejes transversales del nivel secundario. ¿Cuál es la intervención docente más adecuada?",opts:["Ignorar el comentario para no interrumpir el ritmo académico ni generar una confrontación que pueda escalar y afectar el ambiente del aula.","Detener la clase en ese momento, abordar el comentario como oportunidad pedagógica explícita, trabajar con el grupo los principios de respeto y no discriminación, brindar seguimiento al estudiante afectado y documentar el patrón de exclusión para coordinarlo con orientación.","Hablar únicamente con el estudiante que hizo el comentario en privado después de la clase, aplicarle una sanción disciplinaria y no abordar el tema con el resto del grupo para no amplificar la situación.","Incluir el tema de la discriminación en la próxima unidad del libro de texto, sin relacionarlo explícitamente con el incidente para no señalar al estudiante afectado frente a sus compañeros."],correct:1,just:"Los comentarios discriminatorios deben abordarse pedagógicamente en el momento y con el grupo completo, ya que el silencio del docente puede interpretarse como tolerancia. El currículo dominicano establece que la equidad y la ciudadanía democrática se construyen activamente en el aula, no solo se mencionan como contenidos. El seguimiento al estudiante afectado y la coordinación con orientación son componentes indispensables del abordaje integral."},
+{id:5,type:"situacional",text:"Un docente de Matemáticas lleva doce años enseñando y actualmente tiene un grupo de 6to de Secundaria. Su metodología ha sido la misma toda su carrera: explica el tema en la pizarra paso a paso, los estudiantes copian y practican los mismos ejercicios del libro hasta mecanizarlos, y al final de cada unidad aplica una prueba de respuesta corta. Al analizar los resultados de las pruebas nacionales de la promoción anterior, el coordinador pedagógico nota que los estudiantes de ese docente fallan sistemáticamente en ítems de resolución de problemas abiertos y situaciones no rutinarias, aunque tienen resultados aceptables en procedimientos mecánicos. El currículo del nivel secundario establece que el segundo ciclo debe desarrollar el pensamiento abstracto, el razonamiento lógico-deductivo y la capacidad de resolver situaciones problema complejas. ¿Cuál es el elemento fundamental del currículo que esta práctica ignora sistemáticamente?",opts:["La asignación de mayor cantidad de ejercicios del libro de texto, que garantiza la exposición repetida a distintos tipos de problemas y refuerza la automatización de procedimientos necesaria para el bachillerato.","El desarrollo del pensamiento matemático crítico y abstracto mediante situaciones problema abiertas, actividades de indagación, justificación de razonamientos y metodologías activas propias del segundo ciclo del nivel secundario.","La incorporación de herramientas tecnológicas como calculadoras graficadoras y software matemático, que son los recursos que marcan la diferencia en los resultados del bachillerato dominicano.","La diversificación de las evaluaciones hacia pruebas con mayor número de ítems y mayor dificultad técnica que pongan a prueba la amplitud del conocimiento acumulado por los estudiantes."],correct:1,just:"El segundo ciclo del nivel secundario exige que los docentes desarrollen el pensamiento matemático abstracto, el razonamiento lógico-deductivo y la resolución de problemas complejos, no solo la automatización de procedimientos rutinarios. El currículo establece que los estudiantes del bachillerato deben enfrentar situaciones no rutinarias, y esto requiere que la metodología vaya mucho más allá de la explicación magistral y la práctica repetitiva."},
+{id:6,type:"situacional",text:"Una docente de Literatura de 4to de Secundaria asigna la lectura de una novela que narra la historia de una adolescente víctima de violencia doméstica. La actividad planificada es un análisis literario del texto. Al finalizar la sesión, una estudiante se queda sola en el aula y le confía a la docente en voz baja que algunas situaciones de la novela 'no son tan ficticias' y que en su casa pasan cosas similares. La docente nota que la estudiante tiene marcas en los brazos que no había observado antes, y que en las últimas semanas ha faltado dos lunes consecutivos. La orientadora no está disponible porque está en una capacitación externa. Considerando la Ley 136-03 de Protección Integral de Niños, Niñas y Adolescentes y las normativas del MINERD, ¿cuál es la acción correcta de la docente?",opts:["Escuchar con empatía, pedirle a la estudiante que no comparta el tema con nadie más por el momento, y esperar a que la orientadora regrese para trasladarle el caso sin documentar nada por escrito mientras tanto.","Escuchar con calma y sin presionar, garantizarle a la estudiante que será apoyada, notificar de inmediato a la dirección del centro activando el protocolo de protección aunque la orientadora no esté disponible, y documentar lo observado.","Cambiar la selección de lectura para el grupo de inmediato y evitar que el tema del abuso se aborde en el aula, para no generar mayor incomodidad en la estudiante ni en el resto del grupo.","Llamar directamente a los padres de la estudiante para alertarlos de la conversación, ya que la comunicación familia-escuela es un principio del currículo y la situación requiere respuesta rápida."],correct:1,just:"Cuando un estudiante revela indicios de abuso, el docente debe escuchar con empatía y activar el protocolo de protección institucional de inmediato, independientemente de la disponibilidad de la orientadora. La Ley 136-03 obliga a notificar a las autoridades correspondientes. Contactar directamente a la familia puede poner en mayor riesgo a la estudiante si el abuso ocurre en el hogar. La documentación escrita garantiza la trazabilidad legal del caso."},
+{id:7,type:"situacional",text:"Un docente de Historia de 5to de Secundaria viene observando durante varias semanas que una estudiante que antes participaba activamente ha dejado de levantar la mano, llega tensa y en dos ocasiones ha llegado con los ojos enrojecidos. Al hablar con otros estudiantes, el docente se entera de que circula en el chat grupal de la sección una serie de capturas de pantalla editadas con montajes ofensivos protagonizados por la estudiante afectada, a las que se han sumado comentarios hirientes de varios compañeros. El orientador fue informado pero argumentó que el hecho ocurre 'fuera del centro y fuera del horario escolar'. La Ley 66-97 y las normativas del MINERD establecen que el bienestar del estudiantado es responsabilidad del centro también en su dimensión socioemocional. Considerando que el impacto del acoso se manifiesta claramente dentro del aula, ¿qué debe hacer el docente?",opts:["Respetar la posición del orientador, ya que si el acoso ocurre fuera del horario y el espacio físico del centro, la competencia institucional no alcanza para intervenir.","Intervenir activamente trabajando con el grupo los principios de convivencia digital responsable, brindar acompañamiento directo a la estudiante afectada, y presionar institucionalmente para que el caso reciba atención formal aunque el origen sea externo.","Conversar en privado solo con la estudiante afectada y recomendarle que desinstale sus redes sociales para cortar el problema de raíz, sin involucrar al resto del grupo.","Leer ante el grupo el reglamento del centro sobre uso responsable de tecnología como medida preventiva general, sin hacer referencia explícita a la situación de la estudiante afectada."],correct:1,just:"El acoso cibernético que genera impacto emocional visible en el aula es responsabilidad institucional aunque se origine fuera del horario escolar. El currículo dominicano establece que el bienestar socioemocional es parte del proceso educativo. El docente debe actuar, trabajar con el grupo y presionar institucionalmente, ya que el impacto se manifiesta directamente en el aprendizaje y la convivencia del centro."},
+{id:8,type:"situacional",text:"Un docente de Biología de 3ro de Secundaria diseña una práctica experimental sobre fotosíntesis en la que los estudiantes deben observar el proceso en plantas bajo diferentes condiciones de luz. Al terminar, les pide que redacten conclusiones individuales. Al revisar los trabajos, detecta que la gran mayoría copió textualmente los párrafos de la introducción del manual de laboratorio, sin análisis de los resultados obtenidos, sin comparación con la hipótesis inicial y sin referencia a los datos recolectados. El docente reconoce que los estudiantes completaron correctamente el procedimiento experimental pero no saben cómo procesar y comunicar sus hallazgos científicamente. Esta es la segunda práctica del año en que ocurre el mismo patrón. El coordinador señala que el docente necesita revisar su abordaje pedagógico de esta competencia. ¿Cuál es la estrategia más apropiada?",opts:["Anular las prácticas del trimestre y sustituirlas por pruebas escritas sobre los contenidos conceptuales de Biología, hasta que los estudiantes dominen los fundamentos teóricos necesarios para interpretar resultados.","Modelar explícitamente ante el grupo cómo se formula una conclusión científica paso a paso, practicar con ejemplos de prácticas anteriores como andamiaje, brindar retroalimentación formativa específica y diseñar una guía estructurada que oriente el proceso de sistematización.","Calificar los trabajos tal como están para no penalizar a los estudiantes por una habilidad que nunca se les enseñó explícitamente, esperando que la habilidad de síntesis se desarrolle de forma natural.","Conformar un grupo de los cinco estudiantes con mejores calificaciones para que elaboren un modelo de conclusión que los demás puedan imitar en futuras prácticas."],correct:1,just:"Cuando los estudiantes carecen sistemáticamente de una habilidad procedimental, el docente debe enseñarla explícitamente mediante modelado, práctica guiada y retroalimentación formativa. El currículo del nivel secundario establece que las competencias del pensamiento científico —incluyendo la síntesis e interpretación de resultados— deben enseñarse deliberadamente y no darse por adquiridas de grados anteriores."},
+{id:9,type:"situacional",text:"Un docente de Educación Física de 2do de Secundaria tiene en su grupo un estudiante que desde el inicio del año muestra rendimiento físico significativamente inferior al resto: se cansa con rapidez, en tres ocasiones ha tenido que sentarse por mareos y en una oportunidad se desmayó brevemente y fue atendido en el área de salud del centro. Al conversar en privado, el estudiante confiesa que muchos días no desayuna porque en su casa 'a veces no hay nada' y que tampoco lleva merienda. La familia no asiste a las reuniones del centro y los números del expediente están desconectados. Un colega sugiere 'simplemente excusarlo de las actividades más exigentes'. El docente reconoce que esto no soluciona el problema de fondo y que la situación representa un riesgo para la salud del estudiante. ¿Cuál debe ser la primera acción?",opts:["Excusar al estudiante de todas las actividades físicas de manera indefinida, anotando en el registro que tiene 'condición de salud especial' para protegerlo mientras se resuelve la situación.","Reportar la situación de inmediato a la orientación y la dirección con documentación escrita del patrón observado, coordinando acciones de apoyo institucional y articulación con redes comunitarias de protección si es necesario.","Hablar directamente con vecinos o familiares del estudiante para organizar un sistema informal de apoyo alimentario fuera del marco institucional del centro educativo.","Ignorar la situación por el momento y concentrarse en adaptar las actividades físicas, ya que la alimentación es responsabilidad exclusiva de la familia y escapa a las competencias del docente de área."],correct:1,just:"La desnutrición y la inseguridad alimentaria son situaciones de vulnerabilidad grave que afectan el derecho a la educación y la integridad del estudiante. El docente debe reportar con documentación formal para activar los mecanismos institucionales de protección. La Ley 66-97 establece que el sistema educativo debe proteger el bienestar integral del estudiantado, y la coordinación con redes de protección social es parte de ese mandato."},
+{id:10,type:"situacional",text:"Un docente de Informática de 4to de Secundaria asigna un proyecto de investigación sobre el impacto de la inteligencia artificial en el mercado laboral dominicano, con instrucciones explícitas de usar al menos tres fuentes y elaborar un análisis propio. Al revisar los 34 trabajos entregados, detecta que prácticamente todos copiaron y pegaron fragmentos directos de sitios web —principalmente Wikipedia y blogs sin respaldo académico— sin ninguna cita, sin síntesis y sin análisis personal. El docente reconoce que nunca enseñó explícitamente cómo hacer una investigación académica, cómo evaluar la calidad de las fuentes ni cómo citar en formato APA o Chicago. El currículo establece que las competencias de investigación deben desarrollarse progresivamente y que el docente es responsable de enseñarlas. ¿Cuál es el abordaje más adecuado?",opts:["Aplicar calificación de cero a todos los trabajos por plagio académico y anunciar al grupo que en próximas entregas quien copie sin citar será reprobado en el trimestre.","Reconocer que la competencia no fue enseñada suficientemente, dedicar tiempo a enseñar explícitamente búsqueda crítica de fuentes, citación académica y síntesis, y solicitar la reelaboración con andamiaje docente antes de calificar definitivamente.","Aceptar los trabajos tal como están asignando una calificación mínima de aprobado, argumentando que la búsqueda en internet es una competencia digital válida y que el nivel de exigencia era demasiado alto.","Prohibir el uso de internet para futuras investigaciones y exigir que toda la información provenga del libro de texto y materiales físicos disponibles en la biblioteca del centro."],correct:1,just:"El plagio frecuentemente refleja ausencia de instrucción explícita en competencias de investigación. El currículo dominicano establece que el docente debe enseñar deliberadamente la búsqueda crítica, la evaluación de fuentes y la citación ética. Aplicar cero sin instrucción previa no desarrolla las competencias buscadas. La reelaboración con acompañamiento es más coherente con el enfoque formativo del nivel secundario."},
+{id:11,type:"situacional",text:"Una docente de Inglés de 5to de Secundaria lleva tres trimestres evaluando a sus estudiantes exclusivamente mediante pruebas escritas de gramática, vocabulario y comprensión de lectura. Detecta una paradoja: un grupo de seis estudiantes que se comunican espontáneamente en inglés durante las actividades, que responden preguntas con fluidez y demuestran comprensión auditiva superior, obtiene consistentemente calificaciones mediocres en las pruebas escritas, mientras que estudiantes con dificultades comunicativas obtienen notas altas. La docente reconoce que sus instrumentos no están capturando el dominio lingüístico real del grupo. Un supervisor señala que su práctica evaluativa contradice el enfoque de evaluación integral del currículo. ¿Qué elemento fundamental del proceso evaluativo está omitiendo?",opts:["La evaluación exclusiva mediante portafolios de escritura, que es el instrumento más completo para documentar el progreso lingüístico en idiomas extranjeros a largo plazo.","La evaluación diversificada e integral que valore distintas dimensiones del dominio lingüístico (producción oral, comprensión auditiva, comprensión escrita y producción escrita) con múltiples técnicas e instrumentos que evidencien la competencia comunicativa real del estudiante.","La incorporación de un examen estandarizado internacional (TOEFL, Cambridge) como instrumento complementario para validar el nivel frente a estándares externos reconocidos.","La autoevaluación sistemática de los estudiantes sobre su propio proceso, que según el currículo es el instrumento más válido para medir competencias comunicativas en el nivel secundario."],correct:1,just:"El currículo del nivel secundario establece que la evaluación en lenguas extranjeras debe ser integral y diversificada, valorando todas las dimensiones del dominio lingüístico. Una evaluación que solo mide la producción escrita formal invisibiliza las competencias comunicativas orales y contradice el enfoque por competencias del diseño curricular."},
+{id:12,type:"situacional",text:"A mediados del segundo trimestre, el director de un centro de secundaria convoca a los docentes de 4to de Secundaria a una reunión urgente y les comunica que los promedios del grupo están afectando los indicadores del centro ante el Distrito y que, para 'proteger la imagen institucional', todos deben subir entre 5 y 10 puntos a las calificaciones antes de la entrega de boletines. Argumenta que 'en este centro nadie reprueba' y que la instrucción 'viene de arriba'. Un docente de Ciencias Sociales sabe que varios de sus estudiantes tienen promedios bajos que reflejan ausentismo real, trabajos no entregados y participación deficiente, y que sus calificaciones están respaldadas por evidencias documentadas. ¿Cuál debe ser la posición del docente?",opts:["Obedecer la instrucción del director con discreción, ya que la autoridad jerárquica tiene la potestad de tomar decisiones institucionales que el docente no tiene competencia para cuestionar.","Negarse a alterar las calificaciones explicando que esto viola la integridad académica y los principios del currículo del MINERD, documentar la instrucción recibida por escrito y, si la presión persiste, informar a las instancias del Distrito con las evidencias del caso.","Subir moderadamente las calificaciones para cumplir la instrucción de forma parcial y evitar un conflicto laboral, conservando un registro personal de las notas reales por si la situación es cuestionada.","Convocar a los padres del grupo a una reunión informativa para darles a conocer la instrucción recibida y construir una alianza familia-docente que presione a la dirección a retirar la medida."],correct:1,just:"Alterar calificaciones que no reflejan el desempeño real viola la integridad académica, el derecho de los estudiantes a una evaluación honesta y los principios del currículo del MINERD establecidos en la Ley 66-97. El docente debe actuar con integridad ética, documentar la situación y escalarla a las instancias correspondientes si la presión persiste. La obediencia ciega a instrucciones contrarias a la ética profesional no exime al docente de responsabilidad."},
+{id:13,type:"situacional",text:"Una docente de Ciencias Sociales de 1ro de Secundaria trabaja el tema de diversidad cultural y religiosa como parte de la unidad sobre ciudadanía global. Al plantear una actividad de análisis comparativo, dos estudiantes —uno de familia evangélica y otro de familia católica— comienzan a debatir con creciente intensidad sobre cuál es la 'verdadera fe', apelando a argumentos teológicos. Otros se suman tomando posiciones y el ambiente del aula se torna tenso. Una estudiante cuya familia practica el espiritismo afrocaribeño se muestra visiblemente incómoda y deja de participar. La docente percibe que el debate ha superado el análisis académico y se ha convertido en una disputa de identidades. El currículo establece el respeto a la diversidad cultural y religiosa, el laicismo institucional y el desarrollo del pensamiento crítico como principios articulados. ¿Cuál es la estrategia pedagógica más adecuada en este momento?",opts:["Detener el debate definitivamente y continuar con el libro de texto, estableciendo como norma que los temas religiosos no deben discutirse en el aula para evitar conflictos entre los estudiantes.","Reencauzar el debate hacia el análisis académico y comparativo de las distintas tradiciones religiosas como fenómenos culturales, establecer normas explícitas de diálogo respetuoso, validar todas las perspectivas del grupo y aprovechar el momento para desarrollar competencias de ciudadanía democrática.","Dar la razón a la postura religiosa más argumentada académicamente para modelar el pensamiento lógico ante el grupo, dejando claro que no todas las posiciones tienen el mismo respaldo racional.","Pedir a los estudiantes que presenten sus argumentos por escrito como tarea para la próxima clase, canalizando la discusión hacia una actividad académica evaluable sin tratar el problema de la polarización."],correct:1,just:"En el nivel secundario, el docente debe mediar debates sobre temas sensibles sin reprimirlos ni tomar partido, reencauzándolos hacia el análisis académico respetuoso. El currículo dominicano establece que el pensamiento crítico, la ciudadanía democrática y el respeto a la diversidad cultural y religiosa son competencias que se desarrollan activamente, no evitando los temas difíciles sino aprendiendo a analizarlos con rigor y respeto."},
+{id:14,type:"situacional",text:"Un docente de Matemáticas con quince años de experiencia prepara la planificación anual de su grupo de 6to de Secundaria (Bachillerato). Al revisar la planificación, el coordinador observa que todas las actividades están estructuradas alrededor del libro de texto oficial: el docente explica el capítulo, los estudiantes resuelven los ejercicios numerados y al final se aplica la prueba incluida en el libro del docente. No hay situaciones problema abiertas, proyectos de aplicación, ni actividades de indagación. El docente argumenta que 'el libro cubre todo el currículo' y que 'si el MINERD lo aprobó, es suficiente'. El coordinador le señala que para el segundo ciclo el libro es un recurso de apoyo, no el currículo mismo. ¿Cuál es el elemento pedagógico esencial para el Bachillerato que esta planificación omite?",opts:["La incorporación de ejercicios de mayor complejidad técnica extraídos de libros de texto internacionales, que elevan el nivel de exigencia por encima del currículo nacional dominicano.","Las situaciones problema complejas y contextualizadas, las actividades de indagación y los proyectos que promuevan el pensamiento abstracto, el razonamiento matemático deductivo y la aplicación creativa de conocimientos del segundo ciclo.","La sustitución del libro de texto por plataformas digitales interactivas, que son el estándar de calidad pedagógica para el bachillerato en el currículo revisado del MINERD.","La mayor cantidad de evaluaciones sumativas distribuidas a lo largo del año, que permiten un seguimiento más sistemático del logro de competencias en el segundo ciclo del nivel secundario."],correct:1,just:"El libro de texto es un recurso de apoyo al currículo, no el currículo mismo. El segundo ciclo del nivel secundario exige que los estudiantes desarrollen pensamiento abstracto, razonamiento lógico-deductivo y competencias para resolver situaciones no rutinarias. Esto requiere actividades que trasciendan los ejercicios del libro y promuevan el pensamiento matemático de nivel superior."},
+{id:15,type:"situacional",text:"Un estudiante de 3ro de Secundaria tiene diagnóstico médico certificado de TDAH emitido por un neuropediatra, acompañado de un informe de psicología que recomienda adecuaciones específicas: tiempo adicional del 50%, instrucciones fraccionadas y escritas, posibilidad de realizar pruebas en espacio separado y evaluación por partes. La familia entregó estos documentos al inicio del año. Sin embargo, el docente de Ciencias Naturales argumenta que 'aplicar adecuaciones es injusto para el resto del grupo'. Sus calificaciones llevan tres trimestres siendo reprobatorias, aunque la familia y el estudiante reportan que estudia diariamente más de dos horas y comprende los contenidos cuando los explica oralmente. El coordinador le indica al docente que está incumpliendo una normativa. ¿Cuál es la posición correcta según el enfoque inclusivo del currículo?",opts:["Mantener condiciones iguales de evaluación para todos, ya que la equidad requiere que todos sean evaluados con los mismos instrumentos y en las mismas condiciones sin excepciones.","Implementar las adecuaciones curriculares documentadas y certificadas, coordinando con orientación y la familia para garantizar la equidad real del proceso evaluativo, entendiendo que equidad no significa igualdad de condiciones sino igualdad de oportunidades.","Derivar al estudiante al programa de educación especial del Distrito, ya que el TDAH con diagnóstico formal requiere atención en modalidades especializadas que el aula regular no puede proveer.","Permitir adecuaciones solo en las evaluaciones sumativas del trimestre, pero mantener las mismas condiciones en las actividades de clase para que el estudiante desarrolle la tolerancia a la frustración que necesitará en el mundo laboral."],correct:1,just:"Las adecuaciones curriculares para estudiantes con diagnósticos certificados son un derecho reconocido por la Ley 66-97 y el enfoque inclusivo del currículo dominicano. La equidad pedagógica no significa igualdad de condiciones, sino garantizar a cada estudiante las condiciones que necesita para demostrar sus aprendizajes. Las adecuaciones no son privilegios sino ajustes razonables que permiten acceder al currículo en igualdad de oportunidades."},
+{id:16,type:"situacional",text:"En una clase de Filosofía de 6to de Secundaria, el docente plantea un debate sobre el libre albedrío y la responsabilidad moral. Después de varios minutos, el debate escala a una confrontación entre dos grupos: uno con posición teísta (sin Dios no hay moral objetiva) y otro con posición atea (la moral religiosa es imposición cultural). El docente percibe que los estudiantes han dejado de argumentar filosóficamente y están usando el debate para defender identidades. Una estudiante budista se muestra afectada porque su perspectiva es ignorada por completo. El currículo del nivel secundario establece que la Filosofía debe desarrollar el pensamiento crítico autónomo, el diálogo racional y el respeto a la pluralidad de perspectivas, sin que el docente imponga ninguna visión particular. ¿Cuál es la acción más adecuada del docente en este momento?",opts:["Tomar partido por la posición filosófica con mayor respaldo en la tradición occidental del pensamiento racional, modelando así el tipo de argumento filosófico más riguroso para el nivel del bachillerato.","Pausar el debate, reconducirlo hacia el análisis filosófico de argumentos lógicos independientemente de la posición personal, establecer normas de escucha y respeto a la pluralidad, e incorporar las perspectivas no representadas —como la budista— para enriquecer el análisis.","Suspender el debate definitivamente porque el tema es demasiado sensible para el contexto sociocultural dominicano y puede generar divisiones que afecten la convivencia del grupo a largo plazo.","Dejar que el debate siga su curso sin intervenir, ya que la libertad de expresión y la confrontación de ideas son inherentes al pensamiento filosófico y el docente no debe censurar el intercambio académico."],correct:1,just:"El docente de Filosofía actúa como mediador del pensamiento crítico, no como árbitro de verdades absolutas. Cuando el debate pierde su carácter filosófico y se convierte en una disputa de identidades, el docente debe reconducirlo hacia el análisis de argumentos, garantizar la inclusión de todas las perspectivas y mantener el foco en las competencias filosóficas que el currículo busca desarrollar."},
+{id:17,type:"situacional",text:"Un docente de Educación Artística de 2do de Secundaria aplica el mismo criterio evaluativo para todas sus unidades: al final de cada proyecto, el trabajo terminado es calificado según una escala de apreciación estética subjetiva basada en su criterio personal de 'belleza y terminación'. Los borradores, bocetos, investigaciones y el proceso de toma de decisiones que los estudiantes realizan durante semanas no son considerados en ningún momento. Un estudiante que produce trabajos finales brillantes pero raramente experimenta durante el proceso siempre obtiene la nota máxima, mientras que otro que investiga, experimenta y cuestiona constantemente el proceso creativo pero cuyo producto final es menos pulido obtiene calificaciones mediocres. El supervisor señala que la práctica evaluativa contradice el currículo del nivel secundario. ¿Qué elemento evaluativo está siendo ignorado?",opts:["La incorporación de evaluaciones coevaluativas donde los estudiantes se califican mutuamente el producto final con criterios objetivos acordados previamente por el grupo.","La evaluación integral del proceso creativo completo: la investigación de referentes, la elaboración de bocetos, la toma de decisiones creativas, la capacidad de resolver problemas estéticos y la reflexión metacognitiva sobre el propio proceso, no solo el resultado final.","La comparación sistemática del trabajo de los estudiantes con obras del arte contemporáneo dominicano e internacional como criterio de calidad pedagógicamente fundamentado.","La autoevaluación numérica que cada estudiante realiza de su propio producto final al cierre de la unidad, que es el único instrumento válido para asignaturas de carácter subjetivo."],correct:1,just:"El currículo dominicano establece una evaluación integral que valora el proceso de aprendizaje completo, no solo el producto final. En Educación Artística, las competencias que el área busca desarrollar son la indagación, la experimentación, la toma de decisiones creativas y la reflexión. Un estudiante que produce resultados brillantes sin proceso reflexivo no ha desarrollado las mismas competencias que uno que experimenta y reflexiona genuinamente."},
+{id:18,type:"situacional",text:"Un docente de Educación Física de 5to de Secundaria tiene en su grupo una estudiante cuya familia practicante del Islam ha solicitado formalmente mediante comunicación escrita a la dirección que la joven no participe en actividades mixtas de contacto físico y que use ropa que cubra sus brazos y piernas durante las clases. El director trasladó la solicitud al docente para que la gestione pedagógicamente. El docente considera que aceptarla crearía un precedente complicado y que 'en este centro todos juegan igual'. La estudiante se niega a participar en varias actividades y está acumulando calificaciones de cero. Considerando el principio de respeto a la diversidad cultural y religiosa del currículo del nivel secundario, ¿cuál es la posición pedagógicamente correcta?",opts:["Mantener las mismas actividades para todos sin excepción, ya que el laicismo institucional implica que ninguna creencia religiosa puede modificar el desarrollo del currículo oficial del centro.","Dialogar con la familia para comprender el alcance de sus prácticas, adaptar las actividades para que la estudiante pueda participar de manera significativa y conforme a sus creencias dentro del marco del currículo, garantizando que alcance las mismas competencias.","Eximir a la estudiante de la asignatura de Educación Física para el año escolar completo, reemplazando las calificaciones con un informe de seguimiento del docente de Orientación.","Reportar al Distrito Educativo la solicitud de la familia como una interferencia inaceptable en el proceso pedagógico, documentando el caso para proteger al docente de posibles consecuencias institucionales."],correct:1,just:"El currículo dominicano promueve el respeto a la diversidad cultural y religiosa como principio de equidad. El laicismo institucional no implica ignorar las prácticas culturales de las familias sino garantizar que todos los estudiantes tengan acceso equitativo al currículo. La adaptación pedagógica razonable que garantice el desarrollo de las mismas competencias es la respuesta educativa correcta, no la exclusión ni la confrontación."},
+{id:19,type:"situacional",text:"Un docente de Biología de 6to de Secundaria recibe una donación de microscopios electrónicos para el laboratorio. Emocionado con el recurso, planifica de inmediato una práctica de observación de muestras de tejido. Al revisar el plan de clase, el coordinador pedagógico observa que dice únicamente: 'Práctica: observar muestras de tejido animal y vegetal con el microscopio y describir lo que ven.' No hay propósito declarado, no hay preguntas orientadoras, no hay protocolo de observación y no hay vinculación con las competencias del área. Al finalizar la práctica, los estudiantes entregan descripciones genéricas e incorrectas, y varios reportan no haber entendido 'para qué era la práctica'. ¿Qué elementos pedagógicos fundamentales debe incorporar el docente para que la actividad desarrolle genuinamente competencias científicas en el Bachillerato?",opts:["Un tiempo de exploración libre extendido sin guía del docente, ya que el aprendizaje por descubrimiento autónomo es la estrategia más apropiada para el desarrollo del pensamiento científico en el segundo ciclo.","Un propósito de aprendizaje claro vinculado a las competencias del área, preguntas orientadoras que activen el pensamiento analítico, un protocolo estructurado de observación y registro, y una actividad de sistematización de resultados que conecte los hallazgos con los contenidos de la unidad.","La presentación magistral completa del docente sobre histología y tipos de tejido antes de cualquier contacto de los estudiantes con los microscopios o las muestras de laboratorio.","Una prueba diagnóstica escrita sobre el uso correcto del microscopio electrónico como condición obligatoria para que los estudiantes accedan al equipo del laboratorio."],correct:1,just:"El trabajo experimental en el nivel secundario debe diseñarse con estructura pedagógica explícita: propósito vinculado al currículo, preguntas orientadoras, protocolo de observación y actividad de sistematización. El currículo establece que las prácticas de laboratorio deben desarrollar competencias científicas —no solo destrezas de manipulación—, y esto requiere que el docente diseñe cuidadosamente el andamiaje cognitivo de la práctica."},
+{id:20,type:"situacional",text:"Un docente de Historia de 4to de Secundaria ha estructurado toda la unidad sobre la Era de Trujillo en torno a la memorización de fechas, nombres, decretos y eventos ordenados cronológicamente. Sus evaluaciones consisten en pruebas de opción múltiple y completación donde los estudiantes deben recordar datos específicos. Al aplicar una prueba diagnóstica del Distrito que incluía análisis documental, comparación de perspectivas históricas e interpretación de fuentes primarias, los estudiantes obtuvieron los resultados más bajos del centro. El coordinador señala que 'saben los hechos pero no saben hacer historia'. El docente argumenta que 'primero hay que dominar los datos antes de analizar'. El currículo del nivel secundario establece que el pensamiento histórico crítico es una competencia fundamental que debe desarrollarse desde el primer ciclo. ¿Qué tipo de actividades debe incorporar para atender el currículo de forma integral?",opts:["Más ejercicios de repetición y tarjetas de memoria para consolidar los datos históricos hasta que los estudiantes los dominen con solidez suficiente para avanzar al análisis crítico.","Actividades de análisis de fuentes primarias y secundarias, comparación de perspectivas históricas diversas, debate crítico sobre interpretaciones contrastadas de los mismos hechos y conexión de los procesos históricos con la realidad dominicana contemporánea.","Proyecciones de documentales y películas históricas como sustituto de las explicaciones magistrales del docente, para que los estudiantes construyan su comprensión a través de la narrativa visual.","Evaluaciones orales diarias donde los estudiantes reciten cronológicamente los eventos del período estudiado, desarrollando la memoria histórica como base indispensable para el análisis futuro."],correct:1,just:"El pensamiento histórico crítico no se desarrolla después de memorizar los datos, sino a través de la práctica sostenida con fuentes, perspectivas y análisis contextual. El currículo del nivel secundario establece que desde el primer ciclo los estudiantes deben aprender a 'hacer historia': analizar fuentes, comparar interpretaciones, establecer causas y consecuencias y conectar el pasado con el presente dominicano."},
+{id:21,type:"situacional",text:"Una docente de Química de 5to de Secundaria ha planificado una práctica con ácidos y bases que requiere el uso obligatorio de guantes de nitrilo, gafas de seguridad y delantal según el protocolo del centro. Al comenzar, verifica que tres estudiantes llegaron sin el equipo de protección: uno dice que se le olvidó, otro que el suyo se rompió y el tercero que no tenía dinero para comprarlo. La docente tiene prisa porque la práctica fue reprogramada dos veces y el tiempo académico es limitado. Algunos compañeros ofrecen 'prestarles' el equipo de forma rotativa durante la práctica. El coordinador de Ciencias ha enfatizado reiteradamente la política de cero tolerancia ante incumplimientos de seguridad en el laboratorio. Considerando la responsabilidad legal y pedagógica ante la seguridad del estudiantado, ¿cuál es la acción correcta?",opts:["Permitir que los tres estudiantes participen rotando el uso del equipo de protección con sus compañeros, ya que la práctica no puede reprogramarse una tercera vez sin afectar el cumplimiento del currículo.","Suspender la participación de los tres en la práctica activa, gestionar el equipo faltante del almacén del laboratorio si está disponible, y si no es posible, reprogramar con tiempo suficiente para que todos lleguen con el equipo completo antes de exponer a nadie a riesgo químico.","Continuar la práctica con todos los estudiantes bajo observación directa muy cercana de la docente, argumentando que su supervisión constante minimiza el riesgo de accidente.","Asignar calificación de cero a los tres por incumplimiento de las normas de seguridad y dejar que observen desde sus pupitres sin participar activamente."],correct:1,just:"La seguridad en el laboratorio es una responsabilidad legal y pedagógica indelegable del docente. El currículo del nivel secundario establece que las prácticas experimentales deben realizarse en condiciones seguras para todos. Ninguna urgencia curricular justifica exponer a estudiantes a riesgo químico real. El docente debe gestionar el equipo faltante o reprogramar la práctica garantizando las condiciones de seguridad requeridas."},
+{id:22,type:"situacional",text:"Un docente de Lengua Española de 1ro de Secundaria asigna a su grupo la producción de un cuento original como actividad de cierre de la unidad de narrativa. Al calificar los 38 trabajos, aplica una rúbrica diseñada para textos informativos que pondera: ortografía (40%), gramática y concordancia (35%) y estructura formal del párrafo (25%). Aspectos como la originalidad del argumento, la construcción de los personajes, el manejo del suspenso narrativo y la coherencia de la trama no aparecen en ningún criterio. Una estudiante con un cuento excepcionalmente original pero con errores ortográficos frecuentes obtiene 55 puntos, mientras que un estudiante con relato sin interés narrativo pero sin errores formales obtiene 90. Una colega señala que el instrumento no corresponde al tipo de producción solicitada. ¿Qué instrumento es más apropiado para valorar la escritura creativa en el nivel secundario?",opts:["Una prueba de comprensión lectora basada en los propios cuentos del grupo, donde los estudiantes demuestran que pueden identificar los elementos narrativos en sus propias producciones.","Una rúbrica diseñada específicamente para la producción narrativa creativa que valore la originalidad del argumento, la construcción de personajes, la coherencia y tensión de la trama, el uso creativo del lenguaje y la intención comunicativa, con criterios de calidad apropiados para el nivel secundario.","La corrección exclusiva de errores de ortografía y gramática, ya que estos son los aspectos sobre los que el docente tiene criterios objetivos y libres de subjetividad para calificar.","Una evaluación coevaluativa donde los compañeros califican mutuamente los cuentos usando una escala numérica de impacto emocional y entretenimiento que ellos mismos diseñaron."],correct:1,just:"El instrumento evaluativo debe corresponder a la competencia que se quiere valorar. La escritura creativa en el nivel secundario requiere una rúbrica que evalúe las dimensiones narrativas (originalidad, construcción de personajes, tensión dramática, coherencia) e incluya los aspectos formales como uno de varios criterios, no como el criterio dominante. Aplicar criterios de textos informativos a producciones creativas distorsiona la evaluación y desincentiva la creatividad literaria."},
+{id:23,type:"situacional",text:"A mediados del segundo trimestre llega al grupo de 2do de Secundaria un estudiante transferido de un centro del interior del país con calificaciones promedio en todas las asignaturas (entre 70 y 75) y ningún registro de participación sobresaliente. Al incorporarse, el docente de Matemáticas nota que el estudiante resuelve los problemas de clase de manera notablemente más rápida que sus compañeros, usando estrategias de resolución que ningún compañero utilizaría y que el propio docente no había planteado. En dos semanas siempre termina primero y ha comenzado a distraer a los demás por falta de estimulación. La familia comenta que en el centro anterior 'no le prestaban atención'. El currículo establece que la atención a la diversidad incluye a los estudiantes con altas capacidades. ¿Cuál es la acción más pertinente del docente?",opts:["Mantenerlo en el mismo nivel de actividades que el resto del grupo, ya que el expediente indica calificaciones promedio y las primeras semanas no son suficientes para hacer un juicio definitivo sobre sus capacidades.","Aplicar una evaluación diagnóstica específica en profundidad para establecer su nivel real de competencias matemáticas, adaptar las actividades con retos de mayor complejidad y coordinar con el equipo pedagógico del centro el diseño de un plan de enriquecimiento curricular.","Promoverlo al 3ro de Secundaria para que sus capacidades sean adecuadamente desafiadas por el nivel superior del currículo del primer ciclo del nivel secundario.","Asignarlo como tutor permanente de sus compañeros con mayor dificultad, eximiéndolo de las actividades regulares ya que esta función también desarrolla competencias comunicativas y de liderazgo."],correct:1,just:"La atención a la diversidad en el currículo dominicano incluye a los estudiantes con altas capacidades. Cuando el desempeño observado supera lo reflejado en el expediente, el docente debe realizar una evaluación diagnóstica que establezca el nivel real y adaptar el proceso pedagógico para potenciar el desarrollo del estudiante. La inacción ante un estudiante subestimulado puede derivar en desmotivación y conductas disruptivas."},
+{id:24,type:"situacional",text:"Una docente de Orientación de 3ro de Secundaria tiene planificada una sesión sobre salud sexual y reproductiva como parte del programa de Orientación del MINERD para el primer ciclo. El viernes recibe un comunicado firmado por diecisiete familias solicitando que sus hijos sean excluidos de la sesión 'por razones morales y religiosas'. El director del centro, preocupado por el conflicto, sugiere que la docente 'salte esa sesión' o que 'suavice el contenido hasta que prácticamente no diga nada'. La docente sabe que estos contenidos son parte del currículo oficial aprobado y que omitirlos priva a los estudiantes de información fundamental para su salud y protección. ¿Cuál es la posición más correcta según el marco del currículo dominicano?",opts:["Omitir completamente la sesión para mantener la paz institucional con las familias y evitar que el conflicto escale a instancias superiores del Distrito Educativo.","Desarrollar la sesión conforme al programa curricular oficial, coordinando con la dirección para que se comunique a las familias que estos contenidos son parte del currículo aprobado por el MINERD y que responden al derecho de los adolescentes a la información en salud.","Trabajar el tema de forma tan superficial y eufemística que los contenidos pierdan su utilidad preventiva real, cumpliendo formalmente con la planificación sin comprometer la relación con las familias.","Dejar que los propios estudiantes decidan si quieren o no abordar el tema, respetando su autonomía y la de sus familias para determinar qué información reciben en el centro educativo."],correct:1,just:"La educación sexual y reproductiva es parte del currículo oficial del MINERD para el nivel secundario y responde al derecho de los adolescentes a la información en salud como lo establece la Ley 66-97. Omitir estos contenidos por presión de familias implica privar a los estudiantes de información fundamental para su protección. El centro debe comunicar que el currículo es de obligatorio cumplimiento, sin confrontación pero con claridad institucional."},
+{id:25,type:"situacional",text:"Un docente de Lengua Española de 6to de Secundaria diseña el sistema de evaluación del primer trimestre así: tres trabajos de análisis literario que en conjunto representan el 50% de la calificación trimestral, y una única prueba escrita aplicada en la última semana que representa el otro 50%. Un estudiante que a lo largo de diez semanas entregó trabajos de alta calidad, participó activamente en debates y demostró dominio sostenido de las competencias, obtiene un resultado bajo en la prueba final por un episodio de fiebre alta el día de la evaluación, lo que lleva su promedio a la reprobación. La familia apela. El supervisor señala que el sistema de evaluación tiene problemas estructurales. ¿Por qué es cuestionable esta práctica según el enfoque evaluativo del currículo dominicano?",opts:["No es cuestionable, ya que el diseño equilibra dos tipos de instrumentos (trabajos y prueba) y el 50% por tipo es una distribución razonable para el nivel del Bachillerato dominicano.","Porque el currículo establece un sistema de evaluación continua, equilibrada y diversificada donde ningún instrumento único debe tener tanto peso que un desempeño puntual en un día específico pueda anular el proceso acumulado del estudiante a lo largo del trimestre.","Porque las pruebas escritas de larga duración son instrumentos válidos solo para el nivel universitario y el MINERD no las reconoce como instrumentos apropiados para el Bachillerato dominicano.","Porque el 50% asignado a los trabajos de análisis es demasiado bajo para el área de Lengua Española, donde la producción escrita continua debe representar al menos el 80% de la calificación."],correct:1,just:"El currículo dominicano establece que la evaluación debe ser continua, equilibrada y diversificada. Cuando un único instrumento concentra el 50% del peso, un factor externo —enfermedad, ansiedad, circunstancia personal— puede invalidar semanas de trabajo sostenido y no refleja el proceso real del estudiante. El diseño evaluativo debe distribuir el peso de forma que el resultado del trimestre corresponda al desempeño integral a lo largo de todo el período."},
+{id:26,type:"situacional",text:"Un docente de Informática de 3ro de Secundaria tiene un grupo donde el uso no autorizado de teléfonos para acceder a redes sociales durante las clases es un problema recurrente. En lugar de confiscar los teléfonos y escalar el conflicto, decide aprovechar el interés genuino de los estudiantes en la tecnología como punto de entrada pedagógico. Propone diseñar un proyecto de cuatro semanas en el que los estudiantes creen una cuenta institucional en redes sociales para comunicar los proyectos del centro, investigando primero las características de distintas plataformas, los principios de comunicación digital efectiva y los riesgos de la privacidad en línea. El coordinador señala que el proyecto tiene potencial pero debe articularse explícitamente con las competencias del currículo. ¿Cuál es el elemento pedagógico que el docente debe garantizar para que el proyecto sea coherente y no se convierta en una actividad de entretenimiento disfrazada de académica?",opts:["Que el proyecto sea calificado exclusivamente mediante una prueba escrita final sobre los conceptos teóricos de comunicación digital estudiados durante las cuatro semanas del proyecto.","Que el proyecto tenga un propósito de aprendizaje explícito vinculado a competencias del currículo (pensamiento crítico sobre los medios, producción de contenido digital, ciudadanía digital), indicadores de logro claros e instrumentos de evaluación que valoren tanto el proceso como el producto.","Que el proyecto sea completamente libre y autodirigido sin orientación docente, para que sea un ejercicio genuino de aprendizaje autónomo y creatividad sin restricciones curriculares.","Que los estudiantes presenten el proyecto en una exposición abierta a todos los padres de familia del centro como demostración pública de sus competencias tecnológicas ante la comunidad."],correct:1,just:"La integración pedagógica de las TIC requiere que el propósito de aprendizaje sea explícito y esté vinculado a competencias curriculares concretas, con indicadores de logro definidos e instrumentos de evaluación coherentes. El currículo del nivel secundario establece que las tecnologías deben usarse como medios para el desarrollo de competencias, no como fines en sí mismas."},
+{id:27,type:"situacional",text:"Un docente de Ciencias de la Naturaleza de 2do de Secundaria acaba de calificar las pruebas de la Unidad 4 sobre genética básica. Los resultados son alarmantes: 23 de sus 36 estudiantes obtuvieron por debajo de 65 puntos. Es el tercer año consecutivo en que este docente enseña esta unidad con resultados bajos. Al comentarlo con sus colegas, explica que 'los estudiantes de hoy no tienen bases de Biología de primaria' y que 'la unidad de genética siempre es difícil porque los estudiantes no estudian'. El coordinador pedagógico le señala que resultados bajos de tres años consecutivos con distintos grupos sugieren que hay algo en la práctica docente que debe revisarse. El currículo dominicano establece que los resultados del aprendizaje son también un reflejo de la calidad y pertinencia de las estrategias de enseñanza. ¿Cuál es la perspectiva que este docente está ignorando?",opts:["La obligación de aplicar pruebas de recuperación adicionales hasta que todos los estudiantes superen el umbral mínimo establecido por el MINERD para el área de Ciencias de la Naturaleza.","La autoevaluación crítica de la práctica docente: cuando la mayoría del grupo no alcanza los resultados esperados de forma consistente en tres años consecutivos, el docente debe examinar sus estrategias, la pertinencia de sus instrumentos y los ajustes necesarios antes de atribuir los resultados exclusivamente a los estudiantes.","El principio de que la genética es objetivamente uno de los contenidos más complejos del currículo del nivel secundario y que los resultados bajos son una consecuencia inevitable e independiente de la práctica del docente.","La necesidad de reducir el nivel de exigencia de los contenidos de genética para adaptarlos al nivel real de los grupos del primer ciclo del nivel secundario en la actualidad dominicana."],correct:1,just:"Cuando los resultados bajos se repiten con diferentes grupos durante tres años consecutivos, la evidencia apunta hacia la práctica docente como variable a revisar. El currículo dominicano establece que la evaluación es también un insumo para la reflexión y mejora de la práctica. La atribución sistemática de los resultados únicamente a los estudiantes impide la autocrítica necesaria para mejorar la calidad pedagógica."},
+{id:28,type:"situacional",text:"Un estudiante de 4to de Secundaria entrega un trabajo de investigación sobre las consecuencias económicas del modelo agroexportador en la República Dominicana del siglo XX. El trabajo incluye fuentes primarias de archivo, análisis estadístico, conexión con el presente y una propuesta de reflexión crítica, todo redactado con claridad y rigor. Sin embargo, el estudiante no siguió el formato de presentación indicado: no numeró las páginas, las fuentes no están en orden alfabético y no incluyó la hoja de portada con los datos institucionales. El docente le asigna 52 puntos porque su rúbrica pondera el formato con un 60% y el contenido con un 40%. La familia apela argumentando que el estudiante demostró dominio excepcional de las competencias investigativas. El supervisor señala que la rúbrica tiene un problema estructural. ¿Cómo debe el docente reconsiderar tanto la calificación como el instrumento?",opts:["Mantener la calificación de 52 puntos porque las instrucciones de formato fueron claras desde el inicio y seguir instrucciones precisas también es una competencia que debe valorarse con criterio riguroso.","Revisar si el peso asignado al formato en la rúbrica es coherente con las competencias curriculares que se buscaban desarrollar, y reconsiderar tanto la rúbrica como la calificación para que el instrumento valore prioritariamente el desarrollo de competencias de investigación, análisis crítico y argumentación.","Subir la calificación al máximo para resolver el conflicto con la familia, reconociendo que el contenido era excelente, sin modificar la rúbrica para futuras entregas.","Pedirle al estudiante que rehaga únicamente la presentación formal del trabajo en 48 horas para calificarlo de nuevo con la rúbrica original sin ningún ajuste de criterios."],correct:1,just:"El instrumento evaluativo debe ponderar los criterios de forma coherente con las competencias que el área busca desarrollar. Si el objetivo de la actividad era desarrollar competencias de investigación, análisis y argumentación, estas deben tener el mayor peso en la rúbrica, no los aspectos formales de presentación. El docente debe revisar tanto el instrumento como la calificación para que el proceso evaluativo sea coherente con los propósitos del currículo."},
+{id:29,type:"situacional",text:"Un docente de Matemáticas de 1ro de Secundaria recibe al inicio del año un grupo de 42 estudiantes con heterogeneidad pronunciada: 12 tienen manejo sólido de los contenidos de 6to de primaria, 18 tienen dominio parcial con vacíos específicos en fracciones y proporcionalidad, y 12 muestran vacíos significativos en operaciones básicas. El coordinador sugiere implementar diferenciación pedagógica para atender los tres niveles. El docente responde que con 42 estudiantes 'es imposible hacer tres planes diferentes' y que 'tendrá que enseñar al nivel del grupo en su conjunto'. El currículo del nivel secundario establece la atención a la diversidad como principio de equidad. ¿Cómo puede el docente implementar la diferenciación pedagógica de forma práctica y sostenible con este grupo?",opts:["Aceptar que la diferenciación real es pedagógicamente inviable con grupos de más de 30 estudiantes y concentrarse en enseñar al nivel promedio, esperando que los avanzados no se aburran y los rezagados logren alcanzar al grupo.","Diseñar actividades con niveles de complejidad progresiva que permitan distintos puntos de entrada, organizar momentos de trabajo cooperativo con grupos heterogéneos donde los estudiantes se apoyan mutuamente, y proveer andamiaje específico a quienes tienen mayores vacíos mientras los más avanzados trabajan con tareas de mayor complejidad.","Dividir el grupo en tres subgrupos permanentes por nivel de dominio y enseñarle a cada subgrupo contenidos diferentes y progresivos durante las mismas sesiones de clase.","Solicitar al centro que reduzca el número de estudiantes del grupo a un máximo de 25, argumentando que la atención a la diversidad solo es pedagógicamente viable con grupos pequeños."],correct:1,just:"La diferenciación pedagógica no requiere tres planes distintos ni grupos separados. Implica diseñar actividades con niveles de complejidad progresiva, aprovechar el aprendizaje cooperativo y proveer andamiaje específico a quienes lo necesitan. El currículo dominicano establece la atención a la diversidad como principio de equidad que puede implementarse en grupos grandes con estrategias de diseño universal del aprendizaje."},
+{id:30,type:"situacional",text:"Al inicio del año escolar, el director de un centro de secundaria convoca al claustro de docentes para presentar un plan de mejora de indicadores. La estrategia consiste en que todos los docentes de 4to, 5to y 6to de Secundaria destinen al menos el 70% del tiempo de clase a la práctica sistemática de ítems de pruebas nacionales anteriores, dejando de lado proyectos de investigación, prácticas de laboratorio y debates académicos. El director argumenta que 'lo que no aparece en las pruebas no importa'. Varios docentes del área de Ciencias muestran preocupación porque sus prácticas de laboratorio —que desarrollan competencias procedimentales esenciales— serían eliminadas del plan de trabajo. Desde la perspectiva del currículo del nivel secundario, ¿por qué es pedagógicamente cuestionable esta instrucción?",opts:["No es cuestionable en absoluto, ya que las pruebas nacionales son el instrumento de mayor validez para medir el logro de las competencias del currículo y preparar sistemáticamente para ellas garantiza que los estudiantes las alcancen.","Porque el currículo dominicano establece el desarrollo integral de competencias a través de metodologías diversas y activas, y reducir el proceso educativo del segundo ciclo a la práctica mecánica de ítems empobrece el pensamiento crítico, las competencias procedimentales y la formación ciudadana que el Bachillerato busca desarrollar.","Porque los docentes tienen autonomía pedagógica garantizada por la Ley 66-97 para ignorar las directrices del director cuando estas contradicen su criterio profesional sobre la mejor forma de enseñar los contenidos.","Porque las pruebas nacionales del MINERD son de carácter opcional para los centros educativos y su importancia como indicador no justifica alterar la planificación curricular del segundo ciclo del nivel secundario."],correct:1,just:"El currículo dominicano establece el desarrollo integral de competencias a través de metodologías activas y diversas, no solo la preparación para exámenes. Eliminar prácticas de laboratorio, proyectos de investigación y debates académicos para 'practicar ítems' empobrece las competencias procedimentales, científicas y ciudadanas que el Bachillerato dominicano busca desarrollar y que paradójicamente también se evalúan en las pruebas nacionales."},
+{id:31,type:"conceptual",text:"Un supervisor del Distrito presenta al equipo docente de 4to y 5to de Secundaria el siguiente enunciado extraído del Diseño Curricular del Nivel Secundario del MINERD: 'El estudiante será capaz de producir textos escritos y orales de distintas tipologías —narrativos, argumentativos, expositivos, descriptivos— con cohesión, coherencia, adecuación y registro apropiado a las distintas situaciones comunicativas académicas y sociales, demostrando dominio de los recursos retóricos y lingüísticos propios de cada género discursivo.' El supervisor le pide al equipo que identifique a qué elemento del diseño curricular del nivel secundario pertenece este enunciado, distinguiéndolo de otros elementos que podrían parecerse. ¿A qué elemento curricular corresponde?",opts:["Indicador de logro, porque describe con precisión el resultado observable y medible esperado al finalizar una unidad específica de aprendizaje del área de Lengua Española.","Propósito del encuentro de aprendizaje, porque enuncia lo que se espera lograr al finalizar una sesión específica de clase dentro de la unidad de producción textual.","Competencia específica del área de Lengua Española, porque expresa una capacidad amplia, integral y articulada que es propia de esta área del conocimiento, más extensa que un indicador puntual y no limitada a una sola sesión.","Actividad de aprendizaje, porque describe las acciones concretas que los estudiantes realizarán durante el proceso de enseñanza de la unidad de producción textual."],correct:2,just:"Las competencias específicas del área describen capacidades integrales y amplias propias de una disciplina, que se desprenden de las competencias fundamentales. A diferencia de los indicadores de logro (más concretos y verificables mediante criterios específicos), las competencias específicas tienen un alcance que trasciende unidades y períodos particulares. A diferencia del propósito del encuentro, no están acotadas a una sola sesión de clase."},
+{id:32,type:"conceptual",text:"Un coordinador pedagógico revisa la planificación de una docente de Matemáticas de 3ro de Secundaria y encuentra el siguiente enunciado: 'Analiza e interpreta datos estadísticos organizados en tablas de frecuencia y gráficos de barras, calculando e interpretando la media, mediana y moda para extraer conclusiones válidas sobre situaciones de su entorno comunitario, identificando correctamente las tres medidas de tendencia central en al menos el 80% de los ejercicios propuestos.' El coordinador pregunta a qué elemento del diseño curricular pertenece este enunciado y le pide que lo justifique distinguiéndolo de una competencia específica del área y de un propósito del encuentro. ¿Cuál es la respuesta correcta?",opts:["Competencia fundamental del currículo del nivel secundario, porque el pensamiento estadístico es una capacidad de carácter transversal que atraviesa múltiples áreas del conocimiento.","Propósito del encuentro de aprendizaje, porque delimita de forma concreta lo que se espera lograr al finalizar una sesión específica de clase dentro de la unidad estadística.","Actividad de aprendizaje, porque describe lo que los estudiantes harán concretamente: calcular e interpretar las tres medidas de tendencia central durante las sesiones de clase.","Indicador de logro, porque es una evidencia concreta, observable y verificable del desarrollo de una competencia, con criterio de nivel especificado (al menos el 80%) y contexto de aplicación definido."],correct:3,just:"Los indicadores de logro son evidencias concretas, observables y verificables del aprendizaje alcanzado. Se caracterizan por describir con precisión qué debe hacer el estudiante, en qué contexto y con qué nivel de desempeño. La inclusión del criterio cuantitativo ('al menos el 80%') y el contexto de aplicación ('situaciones de su entorno comunitario') son rasgos característicos de un indicador de logro, que lo distinguen de una competencia (más amplia) y de un propósito (acotado a una sesión)."},
+{id:33,type:"conceptual",text:"Al revisar la planificación diaria de un docente de Física de 5to de Secundaria, el inspector de la Regional encuentra al inicio del plan del martes el siguiente enunciado: 'Al concluir esta sesión de clase, los estudiantes identificarán las tres leyes del movimiento de Newton y aplicarán la segunda ley (F=ma) para calcular la fuerza resultante en situaciones problema con una sola fuerza actuante, utilizando unidades del Sistema Internacional.' El inspector le pregunta al docente a qué elemento curricular corresponde y le pide que lo justifique distinguiéndolo del indicador de logro de la unidad y de la competencia específica del área. ¿Cuál es la clasificación correcta?",opts:["Competencia específica del área de Física, porque describe una capacidad amplia de pensamiento científico que se desarrolla a lo largo de toda la unidad de mecánica newtoniana durante el trimestre.","Indicador de logro del período académico, porque es una evidencia medible y observable del aprendizaje alcanzado al finalizar la unidad de dinámica del segundo trimestre del año escolar.","Propósito del encuentro de aprendizaje, porque delimita específicamente lo que se espera lograr al finalizar esa sesión concreta de clase, con alcance temporal acotado a un solo encuentro pedagógico.","Evaluación diagnóstica de la sesión, porque describe el nivel de dominio previo que los estudiantes deben tener sobre las leyes de Newton para poder iniciar la clase del día."],correct:2,just:"El propósito del encuentro de aprendizaje delimita lo que se espera lograr en una sesión específica de clase. Se caracteriza por su alcance temporal acotado a un encuentro, su formulación concreta y su orientación directa hacia los estudiantes. Se distingue de la competencia específica (alcance mucho más amplio, se desarrolla durante todo el ciclo o el año) y del indicador de logro (evidencia técnica y verificable del desempeño a mediano plazo)."},
+{id:34,type:"conceptual",text:"El equipo docente de Ciencias Sociales de 4to y 5to de Secundaria trabaja en la planificación de la unidad sobre globalización. El coordinador presenta el siguiente enunciado para clasificarlo entre los tipos de contenido: 'Investiga y presenta argumentativamente, utilizando fuentes primarias y secundarias contrastadas, las causas multidimensionales y las consecuencias sociales, económicas y culturales de la globalización en el contexto de la República Dominicana, diferenciando la posición de distintos actores y perspectivas políticas ante el fenómeno.' Un docente del equipo dice que es conceptual porque aborda un tema de Economía. Otro dice que es actitudinal porque implica una postura crítica. ¿Cuál es la clasificación correcta según el diseño curricular del nivel secundario?",opts:["Conceptual, porque el enunciado implica que el estudiante conozca y comprenda los conceptos de globalización, sus causas y consecuencias como información de carácter declarativo.","Actitudinal, porque el enunciado promueve en el estudiante una actitud de pensamiento crítico y valoración de la diversidad de perspectivas ante los fenómenos globales.","Procedimental, porque describe un saber hacer complejo: investigar, contrastar fuentes, argumentar, diferenciar perspectivas y presentar con rigor académico sobre un fenómeno social.","Transversal, porque la globalización es un eje temático que atraviesa simultáneamente Economía, Historia, Geografía y Ciudadanía en el currículo del nivel secundario."],correct:2,just:"Los contenidos procedimentales describen saberes hacer: habilidades, destrezas y procedimientos que el estudiante pone en práctica. Los verbos 'investiga', 'presenta argumentativamente', 'utiliza fuentes contrastadas' y 'diferencia perspectivas' describen procedimientos complejos, no información declarativa (conceptual) ni disposiciones o valores (actitudinal). La distinción entre tipos de contenido depende del tipo de saber que se pretende desarrollar."},
+{id:35,type:"conceptual",text:"Un docente de Biología de 5to de Secundaria presenta al coordinador su planificación de la unidad sobre biodiversidad y ecosistemas dominicanos. Entre los contenidos incluidos, el coordinador identifica el siguiente enunciado: 'Respeto, valoración y compromiso con la conservación de la biodiversidad del territorio dominicano como patrimonio natural compartido que debe preservarse para las generaciones futuras y como condición para la sostenibilidad del desarrollo nacional.' El docente clasificó este contenido como conceptual porque 'es información sobre la biodiversidad'. El coordinador le indica que la clasificación es incorrecta. ¿A qué tipo de contenido corresponde realmente?",opts:["Procedimental, porque implica que el estudiante realice acciones concretas y observables de conservación ambiental en su comunidad y entorno inmediato.","Conceptual, porque el estudiante necesita conocer y comprender los conceptos de biodiversidad y patrimonio natural antes de poder valorarlos correctamente, y la comprensión conceptual es el fundamento de cualquier actitud.","Actitudinal, porque expresa un valor (respeto y valoración), una actitud (compromiso) y una norma de comportamiento ciudadano (conservación) que el estudiante debe desarrollar e interiorizar más allá del conocimiento declarativo.","Transversal, porque el respeto a la biodiversidad es un eje que atraviesa todas las áreas del currículo del nivel secundario y no puede adscribirse exclusivamente al área de Biología."],correct:2,just:"Los contenidos actitudinales se refieren a valores, actitudes y normas de comportamiento que los estudiantes deben desarrollar e interiorizar. El enunciado incluye 'respeto', 'valoración' y 'compromiso', que son actitudes y valores, no información declarativa (conceptual) ni procedimientos operativos (procedimental). La confusión con el contenido conceptual es frecuente, pero el indicador clave es el tipo de disposición que se busca desarrollar."},
+{id:36,type:"conceptual",text:"Una docente de Lengua Española de 6to de Secundaria trabaja la unidad de producción de textos argumentativos. Al organizar su planificación, duda entre clasificar el siguiente enunciado como conceptual o procedimental: 'Características estructurales del texto argumentativo académico: tesis, argumentos de autoridad, argumentos de evidencia, contraargumentos, refutación y conclusión; recursos retóricos propios del género: analogía, ejemplificación, concesión y anticipación de objeciones.' El coordinador pedagógico pide que la docente justifique su clasificación ante el equipo. ¿A qué tipo de contenido corresponde este enunciado?",opts:["Procedimental, porque el dominio de las características del texto argumentativo requiere que el estudiante produzca textos, lo que implica un saber hacer que va más allá del conocimiento declarativo.","Actitudinal, porque el texto argumentativo implica que el estudiante valore la diversidad de perspectivas y desarrolle una actitud de apertura al disenso y al debate racional.","Conceptual, porque describe hechos, definiciones, características y elementos que el estudiante debe conocer y comprender de manera declarativa, independientemente de si luego los aplica en sus producciones.","Competencial, porque el dominio de los géneros discursivos argumentativos es la competencia central del área de Lengua Española en el segundo ciclo del nivel secundario."],correct:2,just:"Los contenidos conceptuales son hechos, datos, definiciones, características y estructuras que se conocen y comprenden de forma declarativa. El enunciado describe las 'características estructurales' y los 'recursos retóricos' del texto argumentativo, que son información que el estudiante debe conocer y comprender. La aplicación de ese conocimiento en la producción de textos correspondería a un contenido procedimental distinto y complementario en la planificación."},
+{id:37,type:"conceptual",text:"Durante una reunión de planificación del equipo de Historia de 4to de Secundaria, el docente principal presenta el siguiente enunciado de contenido de la unidad sobre el proceso de independencia dominicana: 'Valoración crítica del proceso independentista dominicano de 1844 como resultado de la lucha colectiva de un pueblo por su autodeterminación, y reconocimiento de este proceso como fuente viva de identidad nacional, ciudadanía activa y compromiso con la soberanía del Estado dominicano.' Uno de sus colegas afirma que es procedimental porque implica 'analizar el proceso'. Otro dice que es conceptual porque 'hay que conocer los hechos'. ¿Cuál es la clasificación correcta?",opts:["Conceptual, porque el estudiante necesita conocer los hechos del proceso de independencia, las fechas, los actores y las causas antes de poder valorarlos correctamente en cualquier actividad.","Actitudinal, porque el enunciado expresa valores (valoración crítica, reconocimiento), actitudes (identidad nacional, compromiso con la soberanía) y normas de comportamiento ciudadano que el estudiante debe desarrollar e interiorizar como parte de su formación cívica.","Procedimental, porque el enunciado implica que el estudiante realice el proceso de análisis y evaluación crítica del contexto histórico del proceso independentista dominicano de 1844.","Transversal, porque la identidad nacional y la soberanía son ejes que atraviesa Historia, Formación Ciudadana, Lengua Española y Educación Artística en el nivel secundario."],correct:1,just:"Los contenidos actitudinales expresan valores, actitudes y normas de comportamiento ciudadano que se espera que los estudiantes desarrollen e interioricen. La 'valoración crítica', el 'reconocimiento' y el 'compromiso con la soberanía' son actitudes y valores de ciudadanía activa, no información declarativa (conceptual) ni procedimientos técnicos (procedimental). Aunque requiere conocer los hechos históricos, el tipo de saber que el enunciado pretende desarrollar es actitudinal."},
+{id:38,type:"conceptual",text:"Un docente de Lengua Española de 3ro de Secundaria desarrolla la siguiente secuencia durante una clase de análisis de textos argumentativos: pide a los estudiantes que lean en parejas un artículo de opinión, formula preguntas como '¿cuál es la tesis del autor?', '¿qué tipo de argumento usa en el tercer párrafo?' y '¿qué contraargumento podría plantearse a esta posición?', circula por el aula tomando notas en su libreta sobre las respuestas de cada pareja, y al finalizar la sesión brinda retroalimentación oral diferenciada señalando específicamente qué identificaron bien y qué deben profundizar, sin registrar ninguna calificación numérica. Un colega que observa la clase le pregunta qué tipo de evaluación está realizando. ¿Cuál es la respuesta correcta?",opts:["Evaluación sumativa, porque el docente está observando y registrando sistemáticamente el nivel de logro alcanzado por los estudiantes al analizar textos argumentativos como cierre de la unidad.","Evaluación diagnóstica, porque el docente está identificando lo que los estudiantes saben y no saben sobre el texto argumentativo antes de iniciar la enseñanza del contenido en profundidad.","Evaluación formativa, porque acompaña el proceso de aprendizaje en tiempo real, orienta con retroalimentación diferenciada y específica sin producir calificación numérica final, con el propósito de mejorar el aprendizaje mientras ocurre.","Coevaluación, porque el trabajo en parejas implica que tanto el docente como los propios estudiantes participan en la observación y el análisis de los textos durante la sesión de clase."],correct:2,just:"La evaluación formativa ocurre durante el proceso de aprendizaje y tiene como propósito orientar y mejorar el desempeño en tiempo real, sin producir calificación final. Sus características son: observación sistemática del proceso, retroalimentación específica y diferenciada, y ausencia de calificación numérica. El currículo dominicano la establece como la práctica evaluativa central en el aula del nivel secundario."},
+{id:39,type:"conceptual",text:"Al finalizar el segundo trimestre, el docente de Física de 5to de Secundaria aplica una prueba integral de tres horas que cubre todos los contenidos de termodinámica y electrostática trabajados en el período, con ítems de cálculo, análisis de situaciones problema y justificación de procesos. A esto se suman las calificaciones acumuladas de tres informes de laboratorio y dos proyectos de aplicación desarrollados a lo largo del trimestre. El promedio ponderado de estos instrumentos constituye la calificación trimestral oficial registrada en el boletín. El director le pide que explique, en la próxima reunión de claustro, a qué tipo de evaluación corresponde este momento del proceso. ¿Cuál es la respuesta correcta?",opts:["Evaluación formativa, porque el docente estuvo observando el proceso de los estudiantes durante todo el trimestre, retroalimentando los informes y orientando los proyectos antes de la prueba final.","Evaluación diagnóstica, porque al identificar los logros y vacíos al cierre del segundo trimestre, los resultados sirven como punto de partida para planificar el contenido del tercer trimestre.","Evaluación sumativa, porque tiene como propósito certificar el nivel de logro alcanzado al cierre del período, produciendo una calificación oficial que se registra en el boletín institucional del estudiante.","Evaluación auténtica, porque incluye instrumentos variados —prueba, informes de laboratorio y proyectos— que permiten valorar el desempeño del estudiante en contextos de aplicación real de las competencias del área."],correct:2,just:"La evaluación sumativa tiene como propósito certificar el nivel de logro al cierre de un período y produce una calificación que se registra oficialmente en el boletín. Se distingue de la formativa (acompaña el proceso sin producir calificación final) y de la diagnóstica (identifica el punto de partida). La diversidad de instrumentos utilizados no cambia su carácter sumativo: lo que la define es su momento (cierre de período) y su propósito (certificación oficial del logro)."},
+{id:40,type:"conceptual",text:"Un docente de Matemáticas de 6to de Secundaria diseña la siguiente secuencia para la unidad de cálculo diferencial: en la primera sesión identifica los saberes previos del grupo sobre funciones y límites mediante preguntas orales y un ejercicio breve sin calificación; durante cinco semanas acompaña el proceso con observación sistemática, retroalimentación escrita en los trabajos de práctica y preguntas orientadoras, sin registrar ninguna nota numérica; en la sesión final aplica un examen individual de cálculo aplicado y califica un proyecto de modelado matemático en contexto real, cuyos resultados constituyen la calificación oficial del trimestre. Un supervisor de la Regional le pide que identifique con precisión todos los tipos de evaluación presentes en la secuencia y que los justifique distinguiéndolos entre sí. ¿Cuál es la descripción más completa y precisa?",opts:["Solo evaluación formativa y sumativa, ya que la evaluación diagnóstica es una práctica recomendada pero no obligatoria para los docentes del segundo ciclo del nivel secundario dominicano.","Solo evaluación sumativa, porque el examen final y el proyecto son los únicos instrumentos que producen calificación oficial registrable en el boletín del estudiante al cierre del trimestre.","Evaluación diagnóstica (identificación de saberes previos en la primera sesión sin calificación), evaluación formativa (acompañamiento sistemático del proceso con retroalimentación sin nota durante cinco semanas) y evaluación sumativa (examen y proyecto con calificación oficial al cierre del trimestre).","Solo evaluación diagnóstica y formativa, porque el examen final es un instrumento de evaluación auténtica que el currículo del nivel secundario distingue como categoría diferente de la evaluación sumativa tradicional."],correct:2,just:"El currículo dominicano integra los tres momentos evaluativos en una secuencia completa: la diagnóstica (identifica el punto de partida real del grupo), la formativa (acompaña y orienta el proceso con retroalimentación continua sin calificación) y la sumativa (certifica el nivel de logro al cierre con calificación oficial). Esta secuencia ilustra el modelo evaluativo integral que el currículo del nivel secundario propone para el desarrollo de competencias en el Bachillerato dominicano."}
+];
+
+/* ─── STATE ─── */
+var cur = 0, activeQuestions = [], answers = [], timerInterval = null, timeLeft = 3600, userName = "";
+
+/* ─── SHUFFLE ─── */
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function buildActiveQuestions() {
+  var shuffled = shuffle(questions);
+  return shuffled.map(function(q) {
+    var indices = [0,1,2,3];
+    var si = shuffle(indices);
+    var newOpts = si.map(function(i) { return q.opts[i]; });
+    var newCorrect = si.indexOf(q.correct);
+    return Object.assign({}, q, { opts: newOpts, correct: newCorrect });
+  });
+}
+
+/* ─── START ─── */
+function startSimulator() {
+  var nameInput = document.getElementById('user-name').value.trim();
+  if (!nameInput) { alert('Por favor, ingrese su nombre completo para continuar.'); document.getElementById('user-name').focus(); return; }
+  userName = nameInput;
+  activeQuestions = buildActiveQuestions();
+  answers = new Array(activeQuestions.length).fill(null);
+  cur = 0; timeLeft = 3600;
+  document.getElementById('welcome-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  renderDots(); renderQ(); startTimer();
+}
+
+/* ─── TIMER ─── */
+function formatTime(s) {
+  var m = Math.floor(s / 60), rs = s % 60;
+  return (m < 10 ? '0' : '') + m + ':' + (rs < 10 ? '0' : '') + rs;
+}
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  var t = document.getElementById('timer-txt');
+  var pill = document.getElementById('timer-pill');
+  t.textContent = formatTime(timeLeft);
+  timerInterval = setInterval(function() {
+    timeLeft--;
+    t.textContent = formatTime(timeLeft);
+    if (timeLeft <= 300) pill.classList.add('warn');
+    if (timeLeft <= 0) { clearInterval(timerInterval); alert('¡El tiempo ha terminado! Se mostrarán sus resultados.'); showResults(); }
+  }, 1000);
+}
+
+/* ─── DOTS ─── */
+function renderDots() {
+  var w = document.getElementById('dots-wrap'); w.innerHTML = '';
+  for (var i = 0; i < activeQuestions.length; i++) {
+    var d = document.createElement('div');
+    var cls = 'dot';
+    if (i === cur) cls += ' current';
+    if (answers[i] !== null) {
+      cls += (answers[i] === activeQuestions[i].correct) ? ' correct' : ' wrong';
+    }
+    d.className = cls;
+    d.textContent = i + 1;
+    d.dataset.i = i;
+    d.onclick = (function(idx) { return function() { goTo(idx); }; })(i);
+    w.appendChild(d);
+  }
+}
+
+/* ─── RENDER QUESTION ─── */
+function renderQ() {
+  var q = activeQuestions[cur];
+  var pct = Math.round((cur / activeQuestions.length) * 100);
+  document.getElementById('prog-txt').textContent = 'Pregunta ' + (cur + 1) + ' de ' + activeQuestions.length;
+  document.getElementById('prog-pct').textContent = pct + ' %';
+  document.getElementById('prog-fill').style.width = pct + '%';
+
+  var badge = q.type === 'situacional' ? 'Situacional' : 'Conceptual';
+  var letters = ['A','B','C','D'];
+  var answered = answers[cur] !== null;
+
+  var html = '<div class="q-card">';
+  html += '<span class="q-badge ' + q.type + '">' + badge + '</span>';
+  html += '<div class="q-num">Pregunta ' + (cur + 1) + ' / ' + activeQuestions.length + '</div>';
+  html += '<div class="q-text">' + q.text + '</div>';
+  html += '<div class="options">';
+
+  for (var i = 0; i < q.opts.length; i++) {
+    var cls = 'opt';
+    if (answered) {
+      cls += ' disabled';
+      if (i === q.correct) cls += ' rev-ok';
+      else if (i === answers[cur] && answers[cur] !== q.correct) cls += ' rev-err';
+    } else {
+      if (answers[cur] === i) cls += ' selected';
+    }
+    var clickHandler = answered ? '' : ' onclick="selectOpt(' + i + ')"';
+    html += '<div class="' + cls + '"' + clickHandler + '>';
+    html += '<div class="opt-ltr">' + letters[i] + '</div>';
+    html += '<div class="opt-txt">' + q.opts[i] + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // FEEDBACK INMEDIATO
+  if (answered) {
+    var isCorrect = answers[cur] === q.correct;
+    var fbClass = isCorrect ? 'correct' : 'wrong';
+    var fbIcon = isCorrect ? '✅' : '❌';
+    var fbTitle = isCorrect ? '¡Correcto!' : 'Respuesta incorrecta';
+
+    html += '<div class="feedback-box ' + fbClass + '">';
+    html += '<div class="fb-header ' + fbClass + '"><span class="fb-icon">' + fbIcon + '</span> ' + fbTitle + '</div>';
+
+    if (!isCorrect) {
+      html += '<div class="fb-correct-label">✔ Respuesta correcta: ' + letters[q.correct] + ') ' + q.opts[q.correct] + '</div>';
+    }
+
+    html += '<div class="fb-just"><span class="fb-just-label">📖 Justificación: </span>' + q.just + '</div>';
+    html += '</div>';
+  }
+
+  // NAV BUTTONS
+  html += '<div class="nav-btns">';
+  if (cur > 0) html += '<button class="btn btn-outline btn-sm" onclick="goTo(' + (cur - 1) + ')">&#8592; Anterior</button>';
+
+  if (!answered) {
+    html += '<span style="font-size:.78rem;color:#9b9ec7;align-self:center;flex:1;text-align:left">Selecciona una opción para ver la justificación</span>';
+  } else {
+    var allAns = answers.every(function(a) { return a !== null; });
+    if (cur < activeQuestions.length - 1) {
+      html += '<button class="btn btn-success btn-sm" onclick="goTo(' + (cur + 1) + ')">Siguiente &#8594;</button>';
+    }
+    if (allAns) {
+      html += '<button class="btn-fin" onclick="showResults()">&#9989; Ver resultados finales</button>';
+    } else if (cur === activeQuestions.length - 1) {
+      html += '<button class="btn btn-outline btn-sm" onclick="showResults()" style="opacity:.7">Ver resultados parciales</button>';
+    }
+  }
+  html += '</div>';
+  html += '</div>';
+
+  document.getElementById('q-area').innerHTML = html;
+}
+
+function selectOpt(i) {
+  if (answers[cur] !== null) return; // ya respondida
+  answers[cur] = i;
+  renderDots();
+  renderQ();
+}
+
+function goTo(i) {
+  cur = i;
+  renderDots();
+  renderQ();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ─── RESULTS ─── */
+function showResults() {
+  if (timerInterval) clearInterval(timerInterval);
+  var ok = 0;
+  for (var i = 0; i < activeQuestions.length; i++) {
+    if (answers[i] === activeQuestions[i].correct) ok++;
+  }
+  var total = activeQuestions.length;
+  var pct = Math.round((ok / total) * 100);
+  var pts = (ok / total * 20).toFixed(2);
+
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('results-screen').style.display = 'block';
+  document.getElementById('final-score').textContent = pts;
+  var tag = document.getElementById('score-tag');
+  if (parseFloat(pts) >= 10) { tag.textContent = '✅ Aprobado'; tag.className = 'score-tag tag-ok'; }
+  else { tag.textContent = '❌ Por debajo del mínimo'; tag.className = 'score-tag tag-no'; }
+  document.getElementById('s-ok').textContent = ok;
+  document.getElementById('s-err').textContent = (total - ok);
+  document.getElementById('s-pct').textContent = pct + '%';
+  document.getElementById('nombre-resultado').textContent = userName;
+  buildReview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function buildReview() {
+  var errors = [], corrects = [];
+  for (var i = 0; i < activeQuestions.length; i++) {
+    if (answers[i] !== activeQuestions[i].correct) errors.push({ q: activeQuestions[i], ans: answers[i], idx: i });
+    else corrects.push({ q: activeQuestions[i], idx: i });
+  }
+  var ra = document.getElementById('review-area');
+  var letters = ['A','B','C','D'];
+  var html = '';
+
+  if (!errors.length) {
+    html += '<div class="review-wrap"><h3>🎉 ¡Excelente! No tuviste ningún error.</h3></div>';
+  } else {
+    html += '<div class="review-wrap"><h3>Revisión de respuestas incorrectas (' + errors.length + ')</h3>';
+    errors.forEach(function(e) {
+      var selLabel = e.ans !== null ? letters[e.ans] + ') ' + e.q.opts[e.ans] : 'Sin respuesta';
+      var corrLabel = letters[e.q.correct] + ') ' + e.q.opts[e.q.correct];
+      html += '<div class="err-item">';
+      html += '<div class="err-num">Pregunta ' + (e.idx + 1) + ' — ' + (e.q.type === 'situacional' ? 'Situacional' : 'Conceptual') + '</div>';
+      html += '<div class="err-q">' + e.q.text + '</div>';
+      html += '<div style="font-size:.8rem;margin-bottom:4px"><span style="color:var(--rojo);font-weight:700">Tu respuesta:</span> ' + selLabel + '</div>';
+      html += '<div style="font-size:.8rem;margin-bottom:6px"><span style="color:var(--verde);font-weight:700">Correcta:</span> ' + corrLabel + '</div>';
+      html += '<div class="err-just"><span class="just-lbl">Justificación: </span>' + e.q.just + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  ra.innerHTML = html;
+}
+
+function restartSimulator() {
+  document.getElementById('results-screen').style.display = 'none';
+  document.getElementById('welcome-screen').style.display = 'block';
+  document.getElementById('user-name').value = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
